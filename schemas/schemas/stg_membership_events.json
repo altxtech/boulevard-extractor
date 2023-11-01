@@ -1,0 +1,28 @@
+[
+  {
+    "name": "loaded_at",
+    "type": "TIMESTAMP",
+    "mode": "REQUIRED",
+    "description": "Timestamp when the data was loaded into the table"
+  },
+  {
+    "name": "node",
+    "type": "STRUCT",
+    "mode": "REQUIRED",
+    "fields": [
+      {"name": "cancelOn", "type": "DATE"},
+      {"name": "clientId", "type": "STRING"},
+      {"name": "endOn", "type": "STRING"},
+      {"name": "id", "type": "STRING"},
+      {"name": "interval", "type": "STRING"},
+      {"name": "locationId", "type": "STRING"},
+      {"name": "name", "type": "STRING"},
+      {"name": "productId", "type": "STRING"},
+      {"name": "startOn", "type": "DATE"},
+      {"name": "status", "type": "STRING"},
+      {"name": "termNumber", "type": "STRING"},
+      {"name": "unitPrice", "type": "INTEGER"}
+    ],
+    "description": "Membership node"
+  }
+]

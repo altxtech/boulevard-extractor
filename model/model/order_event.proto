@@ -1,0 +1,145 @@
+syntax = "proto3";
+
+option go_package = "boulevard_elt/model";
+import "google/protobuf/timestamp.proto";
+
+message AppliedVoucher {
+    string id = 1;
+    Voucher voucher = 2;
+}
+
+message Voucher {
+    google.protobuf.Timestamp expiresOn = 1;
+    string id = 2;
+    OriginatingOrder originatingOrder = 3;
+    Product product = 4;
+    google.protobuf.Timestamp redeemedAt = 5;
+    repeated Service services = 6;
+}
+
+message OriginatingOrder {
+    string id = 1;
+}
+
+message Product {
+    string id = 1;
+}
+
+message Service {
+    string id = 1;
+}
+
+message ClosedBy {
+    string id = 1;
+}
+
+message FeeLine {
+    int64 absoluteAmount = 1;
+    int64 calculatedAmount = 2;
+    int64 calculatedTaxAmount = 3;
+    string id = 4;
+    string label = 5;
+    int64 percentageAmount = 6;
+    repeated Refund refunds = 7;
+    string type = 8;
+}
+
+message Refund {
+    string feeLineId = 1;
+    string id = 2;
+    string orderRefundId = 3;
+    int64 refundAmount = 4;
+    google.protobuf.Timestamp refundedAt = 5;
+}
+
+message Line {
+    int64 currentDiscountAmount = 1;
+    int64 currentPrice = 2;
+    int64 currentSubtotal = 3;
+    repeated Discount discounts = 4;
+    string id = 5;
+    int64 initialDiscountAmount = 6;
+    int64 initialPrice = 7;
+    int64 initialSubtotal = 8;
+    int64 quantity = 9;
+}
+
+message Discount {
+    string description = 1;
+    int64 discountAmount = 2;
+    int64 discountPercentage = 3;
+    DiscountReason discountReason = 4;
+    string id = 5;
+}
+
+message DiscountReason {
+    string id = 1;
+}
+
+message LineGroup {
+    string id = 1;
+    repeated Line lines = 2;
+}
+
+message Location {
+    string id = 1;
+}
+
+message RefundDetails {
+    google.protobuf.Timestamp closedAt = 1;
+    ClosedBy closedBy = 2;
+    google.protobuf.Timestamp createdAt = 3;
+    string id = 4;
+    string number = 5;
+    string orderId = 6;
+    string refundReason = 7;
+    string refundReasonText = 8;
+    string status = 9;
+    Summary summary = 10;
+    google.protobuf.Timestamp updatedAt = 11;
+}
+
+message Summary {
+    int64 refundAmount = 1;
+    int64 refundTax = 2;
+    int64 refundTotal = 3;
+}
+
+message OrderSummary {
+    int64 currentDiscountAmount = 1;
+    int64 currentFeeAmount = 2;
+    int64 currentGratuityAmount = 3;
+    int64 currentSubtotal = 4;
+    int64 currentTaxAmount = 5;
+    int64 currentTotal = 6;
+    int64 initialDiscountAmount = 7;
+    int64 initialFeeAmount = 8;
+    int64 initialGratuityAmount = 9;
+    int64 initialSubtotal = 10;
+    int64 initialTaxAmount = 11;
+    int64 initialTotal = 12;
+    int64 refundAmount = 13;
+}
+
+
+message Order {
+    repeated AppliedVoucher appliedVouchers = 1;
+    string clientId = 2;
+    google.protobuf.Timestamp closedAt = 3;
+    ClosedBy closedBy = 4;
+    google.protobuf.Timestamp createdAt = 5;
+    repeated FeeLine feeLines = 6;
+    string id = 7;
+    repeated LineGroup lineGroups = 8;
+    string locationId = 9;
+    string note = 10;
+    string number = 11;
+    repeated Refund refunds = 12;
+    Summary summary = 13;
+    google.protobuf.Timestamp updatedAt = 14;
+}
+
+message OrderEvent {
+	google.protobuf.Timestamp loaded_at = 1;
+	Order node = 2;
+}

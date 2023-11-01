@@ -1,0 +1,25 @@
+query listMemberships( $after: String, $first: Int ){
+    memberships(after: $after, first: $first ){
+        edges {
+            cursor
+            node {
+				cancelOn
+				clientId
+				endOn
+				id
+				interval
+				locationId
+				name
+				productId
+				startOn
+				status
+				termNumber
+				unitPrice
+            }
+        }
+        pageInfo{
+            hasNextPage
+            endCursor
+        }
+    }
+} 

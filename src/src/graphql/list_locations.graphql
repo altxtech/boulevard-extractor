@@ -1,0 +1,33 @@
+query listLocations( $after: String, $first: Int ){
+    locations(after: $after, first: $first ){
+        edges {
+            cursor
+            node {
+                id
+                address {
+                    city
+                    country
+                    line1
+                    line2
+                    province
+                    state
+                    zip
+                }
+                billingContactEmail
+                businessName
+                contactEmail
+                coordinates
+                externalId
+                isRemote
+                name
+                phone
+                tz
+                website
+            }
+        }
+        pageInfo{
+            hasNextPage
+            endCursor
+        }
+    }
+} 

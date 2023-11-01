@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+option go_packaet="boulevard_elt/model"
+import "google/protobuf/timestamp.proto";
+
+message Address {
+    string city = 1;
+    string country = 2;
+    string line1 = 3;
+    string line2 = 4;
+    string province = 5;
+    string state = 6;
+    string zip = 7;
+}
+
+message Location {
+    string id = 1;
+    Address address = 2;
+    string billingContactEmail = 3;
+    string businessName = 4;
+    string contactEmail = 5;
+    string coordinates = 6;
+    string externalId = 7;
+    bool isRemote = 8;
+    string name = 9;
+    string phone = 10;
+    string tz = 11;
+    string website = 12;
+}
+

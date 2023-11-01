@@ -1,0 +1,14 @@
+query listStaffRoles($after: String, $first: Int) {
+  staffRoles(after: $after, first: $first) {
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+    edges {
+      node {
+        id
+        name
+      }
+    }
+  }
+}

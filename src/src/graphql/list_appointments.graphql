@@ -1,0 +1,42 @@
+query listAppointments($after: String, $locationId: ID!, $first: Int, $query: String){
+    appointments( after: $after, locationId: $locationId, first: $first, query: $query ){
+        edges{
+            cursor
+            node{
+                id
+                appointmentServices {
+					baseAppointmentServiceId
+					duration
+					endAt
+					id
+					price
+					serviceId
+					staffId
+					staffRequested
+					startAt
+					startTimeOffset
+					totalDuration
+                }
+                bookedByType
+                cancellation {
+                    cancelledAt
+                    notes
+                    reason
+                }
+                cancelled
+                clientId
+                createdAt
+                locationId
+                orderId
+                startAt
+                duration
+                endAt
+                state
+            }
+        }
+        pageInfo{
+            endCursor
+            hasNextPage
+        }
+    }
+}

@@ -1,0 +1,382 @@
+[
+  {
+    "name": "loaded_at",
+    "type": "TIMESTAMP",
+    "mode": "REQUIRED",
+    "description": "Timestamp when the data was loaded into the table"
+  },
+  {
+    "name": "node",
+    "type": "STRUCT",
+    "mode": "REQUIRED",
+    "fields": [
+      {
+        "name": "appliedVouchers",
+        "type": "STRUCT",
+        "mode": "REPEATED",
+        "fields": [
+          {
+            "name": "id",
+            "type": "STRING"
+          },
+          {
+            "name": "voucher",
+            "type": "STRUCT",
+            "fields": [
+              {
+                "name": "expiresOn",
+                "type": "TIMESTAMP"
+              },
+              {
+                "name": "id",
+                "type": "STRING"
+              },
+              {
+                "name": "originatingOrder",
+                "type": "STRUCT",
+				"fields": [{"name": "id", "type": "STRING"}]
+              },
+			  {
+                "name": "product",
+                "type": "STRUCT",
+				"fields": [{"name": "id", "type": "STRING"}]
+              },
+              {
+                "name": "redeemedAt",
+                "type": "TIMESTAMP"
+              },
+              {
+                "name": "services",
+                "type": "STRUCT",
+                "mode": "REPEATED",
+                "fields": [
+                  {
+                    "name": "id",
+                    "type": "STRING"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "clientId",
+        "type": "STRING"
+      },
+      {
+        "name": "closedAt",
+        "type": "TIMESTAMP"
+      },
+      {
+        "name": "closedBy",
+        "type": "STRUCT",
+        "fields": [
+          {
+            "name": "id",
+            "type": "STRING"
+          }
+        ]
+      },
+      {
+        "name": "createdAt",
+        "type": "DATETIME"
+      },
+      {
+        "name": "feeLines",
+        "type": "STRUCT",
+        "mode": "REPEATED",
+        "fields": [
+          {
+            "name": "absoluteAmount",
+            "type": "INTEGER"
+          },
+          {
+            "name": "calculatedAmount",
+            "type": "INTEGER"
+          },
+          {
+            "name": "calculatedTaxAmount",
+            "type": "INTEGER"
+          },
+          {
+            "name": "id",
+            "type": "STRING"
+          },
+          {
+            "name": "label",
+            "type": "STRING"
+          },
+          {
+            "name": "percentageAmount",
+            "type": "DECIMAL"
+          },
+          {
+            "name": "refunds",
+            "type": "STRUCT",
+            "mode": "REPEATED",
+            "fields": [
+              {
+                "name": "feeLineId",
+                "type": "STRING"
+              },
+              {
+                "name": "id",
+                "type": "STRING"
+              },
+              {
+                "name": "orderRefundId",
+                "type": "STRING"
+              },
+              {
+                "name": "refundAmount",
+                "type": "INTEGER"
+              },
+              {
+                "name": "refundedAt",
+                "type": "TIMESTAMP"
+              }
+            ]
+          },
+          {
+            "name": "type",
+            "type": "STRING"
+          }
+        ]
+      },
+      {
+        "name": "id",
+        "type": "STRING"
+      },
+      {
+        "name": "lineGroups",
+        "type": "STRUCT",
+        "mode": "REPEATED",
+        "fields": [
+          {
+            "name": "id",
+            "type": "STRING"
+          },
+          {
+            "name": "lines",
+            "type": "STRUCT",
+            "mode": "REPEATED",
+            "fields": [
+              {
+                "name": "currentDiscountAmount",
+                "type": "INTEGER"
+              },
+              {
+                "name": "currentPrice",
+                "type": "INTEGER"
+              },
+              {
+                "name": "currentSubtotal",
+                "type": "INTEGER"
+              },
+              {
+                "name": "discounts",
+                "type": "STRUCT",
+                "mode": "REPEATED",
+                "fields": [
+                  {
+                    "name": "description",
+                    "type": "STRING"
+                  },
+                  {
+                    "name": "discountAmount",
+                    "type": "INTEGER"
+                  },
+                  {
+                    "name": "discountPercentage",
+                    "type": "DECIMAL"
+                  },
+                  {
+                    "name": "discountReason",
+                    "type": "STRUCT",
+                    "fields": [
+                      {
+                        "name": "id",
+                        "type": "STRING"
+                      }
+                    ]
+                  },
+                  {
+                    "name": "id",
+                    "type": "STRING"
+                  }
+                ]
+              },
+			  {
+				  "name": "id",
+				  "type": "STRING"
+			  },
+              {
+                "name": "initialDiscountAmount",
+                "type": "INTEGER"
+              },
+              {
+                "name": "initialPrice",
+                "type": "INTEGER"
+              },
+              {
+                "name": "initialSubtotal",
+                "type": "INTEGER"
+              },
+              {
+                "name": "quantity",
+                "type": "INTEGER"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "locationId",
+        "type": "STRING"
+      },
+      {
+        "name": "note",
+        "type": "STRING"
+      },
+      {
+        "name": "number",
+        "type": "STRING"
+      },
+      {
+        "name": "refunds",
+        "type": "STRUCT",
+        "mode": "REPEATED",
+        "fields": [
+          {
+            "name": "closedAt",
+            "type": "TIMESTAMP"
+          },
+          {
+            "name": "closedBy",
+            "type": "STRUCT",
+            "fields": [
+              {
+                "name": "id",
+                "type": "STRING"
+              }
+            ]
+          },
+          {
+            "name": "createdAt",
+            "type": "TIMESTAMP"
+          },
+          {
+            "name": "id",
+            "type": "STRING"
+          },
+          {
+            "name": "number",
+            "type": "STRING"
+          },
+          {
+            "name": "orderId",
+            "type": "STRING"
+          },
+          {
+            "name": "refundReason",
+            "type": "STRING"
+          },
+          {
+            "name": "refundReasonText",
+            "type": "STRING"
+          },
+          {
+            "name": "status",
+            "type": "STRING"
+          },
+          {
+            "name": "summary",
+            "type": "STRUCT",
+            "fields": [
+              {
+                "name": "refundAmount",
+                "type": "INTEGER"
+              },
+              {
+                "name": "refundTax",
+                "type": "INTEGER"
+              },
+              {
+                "name": "refundTotal",
+                "type": "INTEGER"
+              }
+            ]
+          },
+          {
+            "name": "updatedAt",
+            "type": "TIMESTAMP"
+          }
+        ]
+      },
+      {
+	  "name": "summary",
+	  "type": "STRUCT",
+	  "fields": [
+	    {
+	      "name": "currentDiscountAmount",
+	      "type": "INTEGER"
+	    },
+	    {
+	      "name": "currentFeeAmount",
+	      "type": "INTEGER"
+	    },
+	    {
+	      "name": "currentGratuityAmount",
+	      "type": "INTEGER"
+	    },
+	    {
+	      "name": "currentSubtotal",
+	      "type": "INTEGER"
+	    },
+	    {
+	      "name": "currentTaxAmount",
+	      "type": "INTEGER"
+	    },
+	    {
+	      "name": "currentTotal",
+	      "type": "INTEGER"
+	    },
+	    {
+	      "name": "initialDiscountAmount",
+	      "type": "INTEGER"
+	    },
+	    {
+	      "name": "initialFeeAmount",
+	      "type": "INTEGER"
+	    },
+	    {
+	      "name": "initialGratuityAmount",
+	      "type": "INTEGER"
+	    },
+	    {
+	      "name": "initialSubtotal",
+	      "type": "INTEGER"
+	    },
+	    {
+	      "name": "initialTaxAmount",
+	      "type": "INTEGER"
+	    },
+	    {
+	      "name": "initialTotal",
+	      "type": "INTEGER"
+	    },
+	    {
+	      "name": "refundAmount",
+	      "type": "INTEGER"
+	    }
+	  ],
+	  "description": "Order summary details"
+	},
+	{
+		"name": "updatedAt",
+		"type": "TIMESTAMP"
+	}
+    ]
+  }
+]

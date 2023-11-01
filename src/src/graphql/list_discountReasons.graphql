@@ -1,0 +1,16 @@
+query listDiscountReasons( $after: String, $first: Int ){
+    discountReasons(after: $after, first: $first ){
+        edges {
+            cursor
+            node {
+				hidden
+				id
+				name
+            }
+        }
+        pageInfo{
+            hasNextPage
+            endCursor
+        }
+    }
+} 

@@ -1,0 +1,39 @@
+query listClients( $after: String, $first: Int ){
+    clients(after: $after, first: $first ){
+        edges {
+            cursor
+            node {
+				active
+				appointmentCount
+				createdAt
+				dob
+				email
+				externalId
+				firstName
+				hasCardOnFile
+				id
+				lastName
+				mergedIntoClientId
+				mobilePhone
+				name
+				notes {
+					createdAt
+					id
+					insertedAt
+					text
+				}
+				pronoun
+				tags {
+					id
+					name
+					symbol
+				}
+				updatedAt
+			}
+        }
+        pageInfo{
+            hasNextPage
+            endCursor
+        }
+    }
+} 

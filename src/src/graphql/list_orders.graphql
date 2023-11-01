@@ -1,0 +1,107 @@
+query listOrders( $after: String, $locationId: ID!, $first: Int, $query: String){
+    orders(after: $after, locationId: $locationId, first: $first, query: $query ){
+        edges {
+            cursor
+            node {
+				appliedVouchers {
+					id
+					voucher {
+						expiresOn
+						id
+						redeemedAt
+						services {
+							id
+						}
+					}
+				}
+				clientId
+				closedAt
+				closedBy {
+					id
+				}
+				createdAt
+				feeLines {
+					absoluteAmount
+					calculatedAmount
+					calculatedTaxAmount
+					id
+					label
+					percentageAmount
+					refunds {
+						feeLineId
+						id
+						orderRefundId
+						refundAmount
+						refundedAt
+					}
+					type
+				}
+				id
+				lineGroups {
+					id
+					lines {
+						currentDiscountAmount
+						currentPrice
+						currentSubtotal
+						discounts {
+							description
+							discountAmount
+							discountPercentage
+							discountReason {
+								id
+							}
+							id
+						}
+						id
+						initialDiscountAmount
+						initialPrice
+						initialSubtotal
+						quantity
+					}
+				}
+				locationId
+				note
+				number
+				refunds {
+					closedAt
+					closedBy {
+						id
+					}
+					createdAt
+					id
+					number
+					orderId
+					refundReason
+					refundReasonText
+					status
+					summary {
+						refundAmount
+						refundTax
+						refundTotal
+					}
+					updatedAt
+				}
+				summary {
+					currentDiscountAmount
+					currentFeeAmount
+					currentGratuityAmount
+					currentSubtotal
+					currentTaxAmount
+					currentTotal
+					initialDiscountAmount
+					initialFeeAmount
+					initialGratuityAmount
+					initialSubtotal
+					initialTaxAmount
+					initialTotal
+					refundAmount
+				}
+				updatedAt
+            }
+        }
+        pageInfo{
+            hasNextPage
+            endCursor
+        }
+    }
+} 

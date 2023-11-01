@@ -1,0 +1,33 @@
+query listStaff( $after: String, $first: Int ){
+    staff(after: $after, first: $first ){
+        edges {
+            cursor
+            node {
+				active
+				appRoleId
+				bio
+				createdAt
+				displayName
+				email
+				externalId
+				externalNickname
+				externallyBookable
+				firstName
+				id
+				lastName
+				locations {
+					id
+				}
+				mobilePhone
+				name
+				nickname
+				staffRoleId
+				updatedAt
+            }
+        }
+        pageInfo{
+            hasNextPage
+            endCursor
+        }
+    }
+} 

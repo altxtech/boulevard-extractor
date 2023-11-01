@@ -1,0 +1,18 @@
+query listServiceCategories( $after: String, $first: Int ){
+    serviceCategories(after: $after, first: $first ){
+        edges {
+            cursor
+            node {
+				active
+				createdAt
+				id
+				name
+				updatedAt
+            }
+        }
+        pageInfo{
+            hasNextPage
+            endCursor
+        }
+    }
+} 

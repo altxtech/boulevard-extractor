@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+option go_package = "boulevard_elt/model";
+import "google/protobuf/timestamp.proto";
+
+message MembershipEvent {
+    google.protobuf.Timestamp loaded_at = 1;
+    Membership node = 2;
+}
+
+message Membership {
+    int32 cancelOn = 1;
+    string clientId = 2;
+    string endOn = 3;
+    string id = 4;
+    string interval = 5;
+    string locationId = 6;
+    string name = 7;
+    string productId = 8;
+    int32 startOn = 9;
+    string status = 10;
+    string termNumber = 11;
+    int32 unitPrice = 12;
+}

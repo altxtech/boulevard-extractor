@@ -1,0 +1,23 @@
+query listServices($after: String, $first: Int) {
+  services(after: $after, first: $first) {
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+    edges {
+      node {
+        active
+		addon
+		categoryId
+		createdAt
+		defaultDuration
+		defaultPrice
+		description
+		externalId
+		id
+		name
+		updatedAt
+      }
+    }
+  }
+}

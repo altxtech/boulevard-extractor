@@ -1,0 +1,14 @@
+query listEntity( $after: String, $first: Int ){
+    entities(after: $after, first: $first ){
+        edges {
+            cursor
+            node {
+
+            }
+        }
+        pageInfo{
+            hasNextPage
+            endCursor
+        }
+    }
+} 
