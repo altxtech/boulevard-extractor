@@ -1,0 +1,28 @@
+name: Destroy Tofu Configuration
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to destroy'
+        required: true
+
+jobs:
+  destroy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Tofu Setup
+        uses: opentofu/setup-opentofu@v1
+
+      - name: Tofu Init
+        run: tofu init
+
+      - name: Tofu Select Workspace
+        run: tofu workspace select --or-create ${{ github.event.inputs.environment }}
+
+      - name: Tofu Destroy
+        run: tofu destroy --auto-approve
