@@ -12,7 +12,7 @@ import (
 	"os"
 	"time"
 	"github.com/machinebox/graphql"
-	"boulevard_elt/model"
+	"boulevard-extractor/model"
 )
 
 // Confit
@@ -203,7 +203,7 @@ func main() {
 	ctx := context.Background()
 
 	// run it and capture the response
-	var respData ResponseData
+	var respData map[string]interface{}
 	if err := client.Run(req, ctx, &respData); err != nil {
 	    log.Fatal(err)
 	}
