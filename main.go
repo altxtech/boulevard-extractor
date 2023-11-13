@@ -120,7 +120,7 @@ func configFromEnv() (Config, error) {
 		// User defined
 		secretName := os.Getenv("SECRET_NAME")
 		log.Println("Loading boulevard credentials")
-		boulevardCredsPath := fmt.Sprintf("mnt/secrets/%s", secretName)
+		boulevardCredsPath := fmt.Sprintf("/mnt/secrets/%s", secretName)
 		file, err := os.Open(boulevardCredsPath)
 		if err != nil {
 			log.Fatal("Couldn't retrieve secret: ", err)
@@ -174,7 +174,6 @@ func main() {
 
 	// Creating Boulevard client
 	NewBoulevardClient(config.BoulevardUrl, &config.BoulevardCredentials) 
-
 	
 	router := gin.Default()
 	router.GET("/", hello)
