@@ -67,6 +67,34 @@ func ( client *BoulevardClient ) Run(req *graphql.Request, ctx context.Context, 
 	return nil
 }
 
+
+// Job
+type Job struct {
+	Entity string `json:"entity"`
+	Query string `json:"query"`
+	Status string `json:"status"`
+	Message string `json:"message"` // Latest status message
+}
+func NewJob(entity string, query string) (*Job, error) {
+	// Maybe include some validation here
+	// For example, some jobs will take queries, others won't
+	newJob := &Job {
+		entity,
+		query,
+		"CREATED",
+		"",
+	}
+	return newJob, nil
+}
+func (j *Job) Run() error {
+	
+	log.Println("Running job...")
+	
+	j.Status = "SUCCESS"
+
+	return nil
+}
+
 // Nodes
 // Pagination
 type Cursor string
@@ -158,9 +186,40 @@ func createHttpBasicCredentials(creds *BoulevardCredentials) ( string ) {
 	return httpBasicCredentials
 }
 
+
 // Handlers
 func hello(c *gin.Context){
 	c.String(http.StatusOK, "Hello There")
+}
+
+
+func createJob(c *gin.Context) {
+	entity := c.Query("entity")
+	query := c.DefaultQuery("query", "")
+
+	log.Printf("Creating new job for entity %s with query %s.", entity, query)
+	job, err := NewJob(entity, query) 
+	if err != nil {
+		errMsg := fmt.Sprintf("Error creating job: %v", err)
+		log.Println(errMsg)
+		c.JSON(http.StatusBadRequest, gin.H{"error": errMsg})
+	}
+
+	log.Print("Starting job execution")
+	err = job.Run()
+	if err != nil {
+		errMsg := fmt.Sprintf("Error executing job: %v", err)
+		log.Println(errMsg)
+		c.JSON(http.StatusBadRequest, gin.H{"error": errMsg})
+	}
+
+	log.Print("Evaluate Job execution")
+	if job.Status != "SUCCESS" {
+		c.JSON(http.StatusBadRequest, job)
+	}
+	
+	
+	c.JSON(http.StatusOK, job)
 }
 
 func main() {
@@ -177,6 +236,9 @@ func main() {
 	
 	router := gin.Default()
 	router.GET("/", hello)
+	
+	// Jobs
+	router.POST("/jobs", createJob)
 
 	router.Run()
 }
