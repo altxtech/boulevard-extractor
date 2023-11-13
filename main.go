@@ -203,12 +203,12 @@ func createHttpBasicCredentials(creds *BoulevardCredentials) ( string ) {
 
 func loadQuery(entity string) (*graphql.Request, error) {
 	// Define the path where the GraphQL queries are stored
-	queryPath := fmt.Sprintf("graphql/list_%s.graphql", entity)
+	queryPath := fmt.Sprintf("app/graphql/list_%s.graphql", entity)
 
 	// Read the contents of the GraphQL query file
 	file, err := os.Open(queryPath)
 	if err != nil {
-		log.Fatal("Couldn't retrieve secret: ", err)
+		return nil, fmt.Errorf("Couldn't load query: %v", err)
 	}
 	queryBytes, err := io.ReadAll(file)
 	fmt.Println(queryBytes)
