@@ -262,7 +262,7 @@ func createJob(c *gin.Context) {
 func main() {
 	
 	// List dir
-	entries, err := os.ReadDir("./")
+	entries, err := os.ReadDir("./app")
     if err != nil {
         log.Fatal(err)
     }
