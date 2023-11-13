@@ -18,7 +18,7 @@ WORKDIR /app
 
 # Copy the compiled Go application from the build image
 COPY --from=build /app/app .
-ADD --from=build /app/graphql
+COPY --from=build /app/graphql /app/graphql
 
 # Expose the port that your Go application listens on
 EXPOSE 8080
