@@ -137,6 +137,10 @@ resource "google_cloud_run_service" "app" {
           name  = "ENV"
           value = var.env
         }
+        env {
+          name  = "SECRET_NAME"
+          value = var.secret_name
+        }
       }
       service_account_name = google_service_account.sa.email
       volumes {

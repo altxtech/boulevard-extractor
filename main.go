@@ -119,7 +119,7 @@ func configFromEnv() (Config, error) {
 
 		// User defined
 		secretName := os.Getenv("SECRET_NAME")
-		log.Println("Loading boulevard credentials")
+		log.Printf("Loading secret: %s\n", secretName)
 		boulevardCredsPath := fmt.Sprintf("/mnt/secrets/%s", secretName)
 		file, err := os.Open(boulevardCredsPath)
 		if err != nil {
