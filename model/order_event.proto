@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option go_package = "boulevard_elt/model";
+option go_package = "boulevard-extractor/model";
 import "google/protobuf/timestamp.proto";
 
 message AppliedVoucher {

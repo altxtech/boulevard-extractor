@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option go_packaet="boulevard_elt/model"
+option go_packaet="boulevard-extractor/model"
 import "google/protobuf/timestamp.proto";
 
 message Address {
