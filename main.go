@@ -203,7 +203,7 @@ func createHttpBasicCredentials(creds *BoulevardCredentials) ( string ) {
 
 func loadQuery(entity string) (*graphql.Request, error) {
 	// Define the path where the GraphQL queries are stored
-	queryPath := fmt.Sprintf("app/graphql/list_%s.graphql", entity)
+	queryPath := fmt.Sprintf("graphql/list_%s.graphql", entity)
 
 	// Read the contents of the GraphQL query file
 	file, err := os.Open(queryPath)
@@ -236,6 +236,7 @@ func createJob(c *gin.Context) {
 		errMsg := fmt.Sprintf("Error creating job: %v", err)
 		log.Println(errMsg)
 		c.JSON(http.StatusBadRequest, gin.H{"error": errMsg})
+		return
 	}
 
 	log.Print("Starting job execution")
@@ -244,18 +245,30 @@ func createJob(c *gin.Context) {
 		errMsg := fmt.Sprintf("Error executing job: %v", err)
 		log.Println(errMsg)
 		c.JSON(http.StatusBadRequest, gin.H{"error": errMsg})
+		return
 	}
 
 	log.Print("Evaluate Job execution")
 	if job.Status != "SUCCESS" {
 		c.JSON(http.StatusBadRequest, job)
+		return
 	}
 	
 	
 	c.JSON(http.StatusOK, job)
+	return
 }
 
 func main() {
+	
+	// List dir
+	entries, err := os.ReadDir("./")
+    if err != nil {
+        log.Fatal(err)
+    }
+    for _, e := range entries {
+            fmt.Println(e.Name())
+    }
 	
 	// Initialize App
 	log.Print("Initializing app configuration...")
