@@ -1,17 +1,26 @@
-# Use the official Python runtime as a parent image
-FROM python:3.10-slim
+# Use the official Go base image for your Go version
+FROM golang:1.21 AS build
 
-# Set the working directory to /app
+# Set the working directory inside the container
 WORKDIR /app
 
-# Copy the current directory contents into the container at /app
-COPY src/. /app
+# Copy the Go source code into the container
+COPY . .
 
-# Install any needed packages specified in requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
+# Build the Go application
+RUN CGO_ENABLED=0 GOOS=linux go build -o app
 
-# Make port 8080 available to the world outside this container
+# Use a smaller base image to create the final image
+FROM alpine:latest
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy the compiled Go application from the build image
+COPY --from=build /app/app .
+
+# Expose the port that your Go application listens on
 EXPOSE 8080
 
-# Run app.py when the container launches
-CMD ["python3.10", "app.py"]
+# Define the command to run your Go application
+CMD ["./app"]
