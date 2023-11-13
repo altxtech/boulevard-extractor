@@ -89,10 +89,25 @@ func NewJob(entity string, query string) (*Job, error) {
 func (j *Job) Run() error {
 	
 	log.Println("Running job...")
+
+
+	// Load the Query
+	query, err := loadQuery(j.Entity)
+	if err != nil {
+		msg := fmt.Sprintf("Failed to load query: %v", err)
+		j.Fail(msg)
+		return fmt.Errorf(msg)
+	}
+	
+	log.Println(query)
 	
 	j.Status = "SUCCESS"
 
 	return nil
+}
+func (j *Job) Fail( msg string) {
+	j.Message = msg
+	j.Status = "FAILED"
 }
 
 // Nodes
@@ -184,6 +199,24 @@ func createHttpBasicCredentials(creds *BoulevardCredentials) ( string ) {
     httpBasicPayload := creds.ApiKey + ":" + token
 	httpBasicCredentials := base64.StdEncoding.EncodeToString([]byte(httpBasicPayload))
 	return httpBasicCredentials
+}
+
+func loadQuery(entity string) (*graphql.Request, error) {
+	// Define the path where the GraphQL queries are stored
+	queryPath := fmt.Sprintf("graphql/list_%s.graphql", entity)
+
+	// Read the contents of the GraphQL query file
+	file, err := os.Open(queryPath)
+	if err != nil {
+		log.Fatal("Couldn't retrieve secret: ", err)
+	}
+	queryBytes, err := io.ReadAll(file)
+	fmt.Println(queryBytes)
+
+	// Create a new GraphQL request with the read query
+	req := graphql.NewRequest(string(queryBytes))
+
+	return req, nil
 }
 
 
