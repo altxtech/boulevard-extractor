@@ -181,4 +181,6 @@ func hello(c *gin.Context){
 func main() {
 	router := gin.Default()
 	router.GET("/hello", hello)
+
+	router.Run()
 }
