@@ -18,19 +18,15 @@ import (
 	"github.com/machinebox/graphql"
 )
 
-// Confit
+// Config
 type Config struct {
-        // Job-defined
-        TaskNum    string
-        AttemptNum string
-
 		// User-defined
+		BoulevardUrl string
 		BoulevardCredentials BoulevardCredentials
 }
 
 // Boulevard Credentials
 type BoulevardCredentials struct {
-	Url string `json:"url"`
 	BusinessID string `json:"business_id"`
 	AppID string `json:"app_id"`
 	ApiKey string `json:"api_key"`
@@ -44,14 +40,12 @@ type BoulevardClient struct {
 	BasicHttpCredentials string
 }
 	
-func NewBoulevardClient( creds *BoulevardCredentials ) ( *BoulevardClient ){ 
+func NewBoulevardClient( url string, creds *BoulevardCredentials ) ( *BoulevardClient ){ 
 	// Create the Headers
 	basicHttpCreds := createHttpBasicCredentials( creds )
 
 	// Create the graphql createGraphqlClient
-	graphqlClient := graphql.NewClient(
-		creds.Url,
-	)
+	graphqlClient := graphql.NewClient(url)
 
 	// Crete the Boulevard newBoulevardClient
 	blvdClient := &BoulevardClient {
@@ -123,35 +117,25 @@ type OrderEdge struct {
 
 func configFromEnv() (Config, error) {
 
-        // Job-defined
-        taskNum := os.Getenv("CLOUD_RUN_TASK_INDEX")
-        attemptNum := os.Getenv("CLOUD_RUN_TASK_ATTEMPT")
-
 		// User defined
-		secretsPath := os.Getenv("SECRETS_PATH")
+		secretName := os.Getenv("SECRET_NAME")
 		log.Println("Loading boulevard credentials")
-		boulevardCredsPath := fmt.Sprintf("%s/boulevard_credentials.json", secretsPath)
+		boulevardCredsPath := fmt.Sprintf("mnt/secrets/%s", secretName)
 		file, err := os.Open(boulevardCredsPath)
 		if err != nil {
 			log.Fatal("Couldn't retrieve secret: ", err)
 		}
 		data, err := io.ReadAll(file)
-		log.Println("Boulevard credentials: ", data)
 
 		var boulevardCreds BoulevardCredentials 
 		json.Unmarshal(data, &boulevardCreds)
+
+		// Testing if it worked
+		log.Printf("APP ID: %s", boulevardCreds.AppID)
 		
-		boulevardCreds.Url = os.Getenv("BOULEVARD_URL")
-
-		log.Println("Boulevard Url: ", boulevardCreds.Url)
-		log.Println("Boulevard Business ID: ", boulevardCreds.BusinessID)
-		log.Println("Boulevard App ID: ", boulevardCreds.AppID)
-		log.Println("Boulevard Api Key: ", boulevardCreds.ApiKey)
-
         config := Config{
-                TaskNum:    taskNum,
-                AttemptNum: attemptNum,
-				BoulevardCredentials: boulevardCreds,
+			BoulevardUrl: os.Getenv("BOULEVAR_URL"),
+			BoulevardCredentials: boulevardCreds,
         }
         return config, nil
 }
@@ -174,13 +158,26 @@ func createHttpBasicCredentials(creds *BoulevardCredentials) ( string ) {
 	return httpBasicCredentials
 }
 
+// Handlers
 func hello(c *gin.Context){
 	c.String(http.StatusOK, "Hello There")
 }
 
 func main() {
+	
+	// Initialize App
+	log.Print("Initializing app configuration...")
+	config, err  := configFromEnv()
+	if err != nil {
+		log.Fatal("Issue initializing app configuration. Shutting down")
+	}
+
+	// Creating Boulevard client
+	NewBoulevardClient(config.BoulevardUrl, &config.BoulevardCredentials) 
+
+	
 	router := gin.Default()
-	router.GET("/hello", hello)
+	router.GET("/", hello)
 
 	router.Run()
 }
