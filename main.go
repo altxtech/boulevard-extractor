@@ -1,6 +1,7 @@
 package main
 
 import (
+	"boulevard-extractor/model"
 	"context"
 	"crypto/hmac"
 	"crypto/sha256"
@@ -9,10 +10,12 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"net/http"
 	"os"
 	"time"
+
+	"github.com/gin-gonic/gin"
 	"github.com/machinebox/graphql"
-	"boulevard-extractor/model"
 )
 
 // Confit
@@ -171,42 +174,11 @@ func createHttpBasicCredentials(creds *BoulevardCredentials) ( string ) {
 	return httpBasicCredentials
 }
 
+func hello(c *gin.Context){
+	c.String(http.StatusOK, "Hello There")
+}
+
 func main() {
-	log.Println("Initializing config")
-	config, err := configFromEnv()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// Create the graphql client
-	client := NewBoulevardClient(&config.BoulevardCredentials)
-
-
-	req := graphql.NewRequest(`
-	query listLocations {
-		locations(first: 100) {
-			edges {
-				cursor
-				node {
-					id
-				} 
-			} 
-			pageInfo {
-					hasNextPage
-					endCursor
-			} 
-		}
-	}
-	`)
-
-	// define a Context for the request
-	ctx := context.Background()
-
-	// run it and capture the response
-	var respData map[string]interface{}
-	if err := client.Run(req, ctx, &respData); err != nil {
-	    log.Fatal(err)
-	}
-	
-	log.Println(respData)
+	router := gin.Default()
+	router.GET("/hello", hello)
 }
