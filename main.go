@@ -191,7 +191,7 @@ func configFromEnv() (*Config, error) {
 		json.Unmarshal(data, &boulevardCreds)
 
 		
-		lgo.Println("Here 2")
+		log.Println("Here 2")
 		cfg := &Config{
 			BoulevardUrl: os.Getenv("BOULEVAR_URL"),
 			BoulevardCredentials: &boulevardCreds,
