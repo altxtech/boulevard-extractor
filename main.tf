@@ -51,6 +51,10 @@ variable "image" {
   description = "Image to deploy"
 }
 
+variable "boulevard_url" {
+  description = "boulevard protocol to use (sandbox or live)"
+}
+
 # Configure the Google Cloud provider
 provider "google" {
   project = var.project_id
@@ -140,6 +144,10 @@ resource "google_cloud_run_service" "app" {
         env {
           name  = "SECRET_NAME"
           value = var.secret_name
+        }
+        env {
+          name  = "BOULEVARD_URL"
+          value = var.boulevard_url
         }
       }
       service_account_name = google_service_account.sa.email

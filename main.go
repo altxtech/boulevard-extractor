@@ -193,7 +193,7 @@ func configFromEnv() (*Config, error) {
 		
 		log.Println("Here 2")
 		cfg := &Config{
-			BoulevardUrl: os.Getenv("BOULEVAR_URL"),
+			BoulevardUrl: os.Getenv("BOULEVARD_URL"),
 			BoulevardCredentials: &boulevardCreds,
 		}
 		return cfg, nil
