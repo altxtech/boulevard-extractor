@@ -186,17 +186,17 @@ func configFromEnv() (*Config, error) {
 		}
 		data, err := io.ReadAll(file)
 
-		var boulevardCreds *BoulevardCredentials 
-		json.Unmarshal(data, boulevardCreds)
+		log.Println("Here")
+		var boulevardCreds BoulevardCredentials 
+		json.Unmarshal(data, &boulevardCreds)
 
-		// Testing if it worked
-		log.Printf("APP ID: %s", boulevardCreds.AppID)
 		
-        config := &Config{
+		lgo.Println("Here 2")
+		cfg := &Config{
 			BoulevardUrl: os.Getenv("BOULEVAR_URL"),
-			BoulevardCredentials: boulevardCreds,
-        }
-        return config, nil
+			BoulevardCredentials: &boulevardCreds,
+		}
+		return cfg, nil
 }
 
 // GQL credentials
