@@ -114,7 +114,7 @@ func (j *Job) Run() error {
 		return fmt.Errorf(msg)
 	}
 
-	log.Println(responseData)
+	log.Println(responseData[j.Entity])
 	
 	j.Status = "SUCCESS"
 
