@@ -22,7 +22,7 @@ import (
 type Config struct {
 		// User-defined
 		BoulevardUrl string
-		BoulevardCredentials BoulevardCredentials
+		BoulevardCredentials *BoulevardCredentials
 }
 
 // Boulevard Credentials
@@ -94,17 +94,33 @@ func (j *Job) Run() error {
 	// Load the Query
 	query, err := loadQuery(j.Entity)
 	if err != nil {
-		msg := fmt.Sprintf("Failed to load query: %v", err)
+		msg := fmt.Sprintf("Failed to load query - %v", err)
 		j.Fail(msg)
 		return fmt.Errorf(msg)
 	}
-	
-	log.Println(query)
+
+	// Add parameters to the query as needed
+	query.Var("first", 100)
+	if j.Query != "" {
+		query.Var("query", j.Query)
+	}
+
+	// For testing: query a single page
+	var responseData map[string]interface{}
+	err = blvd.Run(query, context.Background(), &responseData)
+	if err != nil{
+		msg := fmt.Sprintf("Failed to execute query - %v", err)
+		j.Fail(msg)
+		return fmt.Errorf(msg)
+	}
+
+	log.Println(responseData)
 	
 	j.Status = "SUCCESS"
 
 	return nil
 }
+
 func (j *Job) Fail( msg string) {
 	j.Message = msg
 	j.Status = "FAILED"
@@ -158,7 +174,7 @@ type OrderEdge struct {
 }
 
 
-func configFromEnv() (Config, error) {
+func configFromEnv() (*Config, error) {
 
 		// User defined
 		secretName := os.Getenv("SECRET_NAME")
@@ -170,13 +186,13 @@ func configFromEnv() (Config, error) {
 		}
 		data, err := io.ReadAll(file)
 
-		var boulevardCreds BoulevardCredentials 
-		json.Unmarshal(data, &boulevardCreds)
+		var boulevardCreds *BoulevardCredentials 
+		json.Unmarshal(data, boulevardCreds)
 
 		// Testing if it worked
 		log.Printf("APP ID: %s", boulevardCreds.AppID)
 		
-        config := Config{
+        config := &Config{
 			BoulevardUrl: os.Getenv("BOULEVAR_URL"),
 			BoulevardCredentials: boulevardCreds,
         }
@@ -211,7 +227,6 @@ func loadQuery(entity string) (*graphql.Request, error) {
 		return nil, fmt.Errorf("Couldn't load query: %v", err)
 	}
 	queryBytes, err := io.ReadAll(file)
-	fmt.Println(queryBytes)
 
 	// Create a new GraphQL request with the read query
 	req := graphql.NewRequest(string(queryBytes))
@@ -259,27 +274,30 @@ func createJob(c *gin.Context) {
 	return
 }
 
-func main() {
-	
-	// List dir
-	entries, err := os.ReadDir("./")
-    if err != nil {
-        log.Fatal(err)
-    }
-    for _, e := range entries {
-            fmt.Println(e.Name())
-    }
-	
-	// Initialize App
-	log.Print("Initializing app configuration...")
-	config, err  := configFromEnv()
-	if err != nil {
-		log.Fatal("Issue initializing app configuration. Shutting down")
-	}
+// Initialization functions
+// 1 . Boulevard Client
+var config *Config 
+var blvd BoulevardClient
 
-	// Creating Boulevard client
-	NewBoulevardClient(config.BoulevardUrl, &config.BoulevardCredentials) 
-	
+func initConfig() {
+	var err error
+	config, err = configFromEnv()
+	if err != nil {
+		log.Fatal("Failed to initialize config: ", err)
+	}
+}
+
+func initBoulevardClient() {
+	blvd = *NewBoulevardClient(config.BoulevardUrl, config.BoulevardCredentials)
+}
+
+
+func main() {
+
+	// Initialization
+	initConfig()
+	initBoulevardClient()
+
 	router := gin.Default()
 	router.GET("/", hello)
 	
