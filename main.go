@@ -281,7 +281,7 @@ func createJob(c *gin.Context) {
 
 	log.Printf("Creating new job for entity %s with query %s.", entity, query)
 	switch entity {
-	case "location":
+	case "locations":
 		job, err := NewJob[*Location](entity, query)
 		if err != nil {
 			errMsg := fmt.Sprintf("Error creating job: %v", err)
