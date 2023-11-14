@@ -68,24 +68,23 @@ func ( client *BoulevardClient ) Run(req *graphql.Request, ctx context.Context, 
 
 
 // Job
-type Job struct {
+type Job[T Node] struct {
 	Entity string `json:"entity"`
 	Query string `json:"query"`
 	Status string `json:"status"`
 	Message string `json:"message"` // Latest status message
+	Data []*T `json:"data"`
 }
-func NewJob(entity string, query string) (*Job, error) {
+func NewJob[T Node](entity string, query string) (*Job[T], error) {
 	// Maybe include some validation here
 	// For example, some jobs will take queries, others won't
-	newJob := &Job {
-		entity,
-		query,
-		"CREATED",
-		"",
-	}
+	var newJob *Job[T]
+
+	newJob.Status = "CREATED"
+	newJob.Message = ""
 	return newJob, nil
 }
-func (j *Job) Run() error {
+func (j *Job[T]) Run() error {
 	
 	log.Println("Running job...")
 
@@ -106,31 +105,40 @@ func (j *Job) Run() error {
 
 	// For testing: query a single page
 	// And also - hard code it to work with locations
-	var responseData ConnectionQueryResponse[*Location]
-	err = blvd.Run(query, context.Background(), &responseData)
-	if err != nil{
-		msg := fmt.Sprintf("Failed to execute query - %v", err)
-		j.Fail(msg)
-		return fmt.Errorf(msg)
-	}
 
-	log.Println(responseData[j.Entity])
 	
 	j.Status = "SUCCESS"
 
 	return nil
 }
 
-func (j *Job) Fail( msg string) {
+func (j *Job[T]) Fail( msg string) {
 	j.Message = msg
 	j.Status = "FAILED"
+}
+
+func (j *Job[T]) ExecuteQuery( query *graphql.Request ) error {
+	var responseData ConnectionQueryResponse[T]
+	err := blvd.Run(query, context.Background(), &responseData)
+	if err != nil{
+		msg := fmt.Sprintf("Failed to execute query - %v", err)
+		j.Fail(msg)
+		return fmt.Errorf(msg)
+	}
+
+	// Add nodes to Data
+	for _, edge := range responseData[j.Entity].Edges {
+		j.Data = append(j.Data, edge.Node)
+	}
+
+	return nil
 }
 
 // Core types
 type ConnectionQueryResponse[T Node] map[string]*Connection[T]
 
 type Connection[T Node] struct {
-	Edges *[]Edge[T] `json:"edges"`
+	Edges []*Edge[T] `json:"edges"`
 	PageInfo *PageInfo `json:"pageInfo"`
 }
 
@@ -270,7 +278,7 @@ func createJob(c *gin.Context) {
 	query := c.DefaultQuery("query", "")
 
 	log.Printf("Creating new job for entity %s with query %s.", entity, query)
-	job, err := NewJob(entity, query) 
+	job, err := NewJob[*Location](entity, query) 
 	if err != nil {
 		errMsg := fmt.Sprintf("Error creating job: %v", err)
 		log.Println(errMsg)
