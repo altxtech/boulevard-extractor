@@ -15,6 +15,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/machinebox/graphql"
+	"github.com/segmentio/encoding/proto"
 )
 
 // Config
@@ -164,6 +165,32 @@ type Node interface{
 	GetID() string
 }
 
+/* Generic
+The generic node are for the nodes we haven't implemented a Node type yet.  
+
+The disavantage of the generic node is that it is expensive covert it to the respective proto messages,
+since we need encode it into Json first and then decode to the proto message
+*/
+
+type GenericNode map[string]interface{}
+func (n *GenericNode) GetID() string {
+	return (*n)["id"].(string)
+}
+func (n *GenericNode) ToProto(message *proto.Message) error{
+	// 1. Encode as Json
+	json_data, err := json.Marshal(&n)
+	if err != nil {
+		return err
+	}
+
+	// 2. Decode to proto
+	err = json.Unmarshal(json_data, &message)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // Location
 type Address struct {
 	Street   string `json:"street"`
@@ -282,7 +309,7 @@ func createJob(c *gin.Context) {
 	log.Printf("Creating new job for entity %s with query %s.", entity, query)
 	switch entity {
 	case "locations":
-		job, err := NewJob[*Location](entity, query)
+		job, err := NewJob[*GenericNode](entity, query)
 		if err != nil {
 			errMsg := fmt.Sprintf("Error creating job: %v", err)
 			log.Println(errMsg)
