@@ -1,7 +1,6 @@
 package main
 
 import (
-	"boulevard-extractor/model"
 	"context"
 	"crypto/hmac"
 	"crypto/sha256"
@@ -20,9 +19,9 @@ import (
 
 // Config
 type Config struct {
-		// User-defined
-		BoulevardUrl string
-		BoulevardCredentials *BoulevardCredentials
+	// User-defined
+	BoulevardUrl string
+	BoulevardCredentials *BoulevardCredentials
 }
 
 // Boulevard Credentials
@@ -106,7 +105,8 @@ func (j *Job) Run() error {
 	}
 
 	// For testing: query a single page
-	var responseData map[string]interface{}
+	// And also - hard code it to work with locations
+	var responseData ConnectionQueryResponse[*Location]
 	err = blvd.Run(query, context.Background(), &responseData)
 	if err != nil{
 		msg := fmt.Sprintf("Failed to execute query - %v", err)
@@ -126,7 +126,19 @@ func (j *Job) Fail( msg string) {
 	j.Status = "FAILED"
 }
 
-// Nodes
+// Core types
+type ConnectionQueryResponse[T Node] map[string]*Connection[T]
+
+type Connection[T Node] struct {
+	Edges *[]Edge[T] `json:"edges"`
+	PageInfo *PageInfo `json:"pageInfo"`
+}
+
+type Edge[T Node] struct {
+	Cursor Cursor `json:"cursor"`
+	Node *T `json:"node"`
+}
+
 // Pagination
 type Cursor string
 type PageInfo struct {
@@ -136,42 +148,54 @@ type PageInfo struct {
 	StartCursor Cursor `json:"startCursor"`
 }
 
+// Nodes
+// Most important ones: Location, Memberships, Orders, Staff, Appointments
+type Node interface{ 
+	GetID() string
+}
+
 // Location
-type LocationConnection struct {
-	Edges []LocationEdge `json:"edges"`
-	PageInfo PageInfo `json:"PageInfo"`
+type Address struct {
+	Street   string `json:"street"`
+	City     string `json:"city"`
+	State    string `json:"state"`
+	ZipCode  string `json:"zipCode"`
+	Country  string `json:"country"`
 }
 
-type LocationEdge struct {
-	Cursor Cursor `json:"cursor"`
-	Node Location `json:"node"`
+type Email string
+
+type Coordinates struct {
+	Latitude  float64 `json:"latitude"`
+	Longitude float64 `json:"longitude"`
 }
+
+type PaymentOption struct {
+	Name  string  `json:"name"`
+	Price float64 `json:"price"`
+}
+
+type PhoneNumber string
+
+type Tz string
+
 type Location struct {
-	// TODO: Implement
-}	
-type Address struct { 
-	// TODO Implement
+	Address               Address                `json:"address"`
+	BusinessName          string                 `json:"businessName"`
+	ContactEmail          Email                  `json:"contactEmail"`
+	Coordinates           Coordinates            `json:"coordinates"`
+	ExternalID            string                 `json:"externalId"`
+	ID                    string                 `json:"id"`
+	IsRemote              bool                   `json:"isRemote"`
+	Name                  string                 `json:"name"`
+	Phone                 PhoneNumber            `json:"phone"`
+	Tz                   Tz                     `json:"tz"`
+	Website              string                 `json:"website"`
+}
+func (l *Location) GetID() string {
+	return l.ID
 }
 
-// Memberships
-type MembershipConnection struct {
-	Edges []MembershipEdge `json:"edges"`
-	PageInfo PageInfo `json:"PageInfo"`
-}
-type MembershipEdge struct {
-	Cursor Cursor `json:"cursor"`
-	Node model.Membership `json:"node"` // We are trying to extract the proto types right away, so we don't have to go through the pain the ass of converting later 
-}
-
-// Orders
-type OrderConnection struct {
-	Edges []MembershipEdge `json:"edges"`
-	PageInfo PageInfo `json:"PageInfo"`
-}
-type OrderEdge struct {
-	Cursor Cursor `json:"cursor"`
-	Node model.Order `json:"node"` // We are trying to extract the proto types right away, so we don't have to go through the pain the ass of converting later 
-}
 
 
 func configFromEnv() (*Config, error) {
