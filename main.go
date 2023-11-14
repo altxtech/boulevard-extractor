@@ -78,10 +78,14 @@ type Job[T Node] struct {
 func NewJob[T Node](entity string, query string) (*Job[T], error) {
 	// Maybe include some validation here
 	// For example, some jobs will take queries, others won't
-	var newJob *Job[T]
+	newJob := &Job[T]{
+		entity,
+		query,
+		"CREATED",
+		"",
+		[]*T{},
+	}
 
-	newJob.Status = "CREATED"
-	newJob.Message = ""
 	return newJob, nil
 }
 func (j *Job[T]) Run() error {
@@ -102,11 +106,17 @@ func (j *Job[T]) Run() error {
 	if j.Query != "" {
 		query.Var("query", j.Query)
 	}
-
-	// For testing: query a single page
-	// And also - hard code it to work with locations
-
 	
+	response, err := executeConnectionQuery[T](query)
+	if err != nil {
+		msg := fmt.Sprintf("Failed to execute request - %v", err)
+		j.Fail(msg)
+		return fmt.Errorf(msg)
+	}
+	for _, edge := range response[j.Entity].Edges {
+		j.Data = append(j.Data, edge.Node)
+	}
+
 	j.Status = "SUCCESS"
 
 	return nil
@@ -117,21 +127,13 @@ func (j *Job[T]) Fail( msg string) {
 	j.Status = "FAILED"
 }
 
-func (j *Job[T]) ExecuteQuery( query *graphql.Request ) error {
-	var responseData ConnectionQueryResponse[T]
+func executeConnectionQuery[T Node](query *graphql.Request) (ConnectionQueryResponse[T], error) {
+	var responseData ConnectionQueryResponse[T] 
 	err := blvd.Run(query, context.Background(), &responseData)
 	if err != nil{
-		msg := fmt.Sprintf("Failed to execute query - %v", err)
-		j.Fail(msg)
-		return fmt.Errorf(msg)
+		return nil, err
 	}
-
-	// Add nodes to Data
-	for _, edge := range responseData[j.Entity].Edges {
-		j.Data = append(j.Data, edge.Node)
-	}
-
-	return nil
+	return responseData, nil
 }
 
 // Core types
@@ -278,32 +280,41 @@ func createJob(c *gin.Context) {
 	query := c.DefaultQuery("query", "")
 
 	log.Printf("Creating new job for entity %s with query %s.", entity, query)
-	job, err := NewJob[*Location](entity, query) 
-	if err != nil {
-		errMsg := fmt.Sprintf("Error creating job: %v", err)
+	switch entity {
+	case "location":
+		job, err := NewJob[*Location](entity, query)
+		if err != nil {
+			errMsg := fmt.Sprintf("Error creating job: %v", err)
+			log.Println(errMsg)
+			c.JSON(http.StatusBadRequest, gin.H{"error": errMsg})
+			return
+		}
+
+		log.Print("Starting job execution")
+		err = job.Run()
+		if err != nil {
+			errMsg := fmt.Sprintf("Error executing job: %v", err)
+			log.Println(errMsg)
+			c.JSON(http.StatusBadRequest, gin.H{"error": errMsg})
+			return
+		}
+
+		log.Print("Evaluate Job execution")
+		if job.Status != "SUCCESS" {
+			c.JSON(http.StatusBadRequest, job)
+			return
+		}
+		
+		
+		c.JSON(http.StatusOK, job)
+		return
+
+	default:
+		errMsg := "Invalid entity"
 		log.Println(errMsg)
 		c.JSON(http.StatusBadRequest, gin.H{"error": errMsg})
 		return
 	}
-
-	log.Print("Starting job execution")
-	err = job.Run()
-	if err != nil {
-		errMsg := fmt.Sprintf("Error executing job: %v", err)
-		log.Println(errMsg)
-		c.JSON(http.StatusBadRequest, gin.H{"error": errMsg})
-		return
-	}
-
-	log.Print("Evaluate Job execution")
-	if job.Status != "SUCCESS" {
-		c.JSON(http.StatusBadRequest, job)
-		return
-	}
-	
-	
-	c.JSON(http.StatusOK, job)
-	return
 }
 
 // Initialization functions
